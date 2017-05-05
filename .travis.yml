@@ -1,0 +1,7 @@
+---
+dist: trusty
+sudo: required
+install:
+  - wget -O /tmp/vagrant.deb https://releases.hashicorp.com/vagrant/1.9.4/vagrant_1.9.4_x86_64.deb
+  - dpkg -i /tmp/vagrant.deb
+  - vagrant plugin install vagrant-aws
