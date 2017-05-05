@@ -1,7 +1,10 @@
 ---
 dist: trusty
 sudo: required
+language: javascript
 install:
   - wget -O /tmp/vagrant.deb https://releases.hashicorp.com/vagrant/1.9.4/vagrant_1.9.4_x86_64.deb
-  - dpkg -i /tmp/vagrant.deb
+  - sudo dpkg -i /tmp/vagrant.deb
   - vagrant plugin install vagrant-aws
+  - vagrant box add aws-dummy dummy.box
+script: echo ok
