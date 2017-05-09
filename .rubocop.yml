@@ -1,0 +1,6 @@
+AllCops:
+  TargetRubyVersion: 2.2 # vagrant built-in ruby version
+
+Security/YAMLLoad:
+  Exclude:
+    - 'Vagrantfile' # safe_load not compatible with Vagrant
