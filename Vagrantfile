@@ -11,6 +11,8 @@ File.open(PRIVATE_KEY_PATH, 'w') do |f|
   f.write(ENV['INDIGO_TESTS_PEM'].split('\n').join("\n"))
 end
 
+puts IO.read(PRIVATE_KEY_PATH)
+
 # Create boxes
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   keys = YAML.load(IO.read('keys.yml'))
