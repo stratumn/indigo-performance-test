@@ -1,0 +1,5 @@
+#!/bin/sh
+
+{% for host in groups['all'] if host != inventory_hostname -%}
+    echo '{"method": "dial_seeds", "params": [["{{ host }}:46656"]] }' | curl -d @- localhost:46657
+{% endfor %}

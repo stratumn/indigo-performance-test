@@ -1,0 +1,11 @@
+---
+- name: Install docker-compose
+  pip:
+    name: docker-compose
+    version: "1.9.0"
+
+- name: Start docker service
+  service:
+    name: docker
+    state: started
+    enabled: true

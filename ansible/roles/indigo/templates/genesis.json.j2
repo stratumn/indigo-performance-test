@@ -1,0 +1,6 @@
+{
+    "app_hash": "",
+    "chain_id": "ffa",
+    "genesis_time": "2017-01-01T00:00:00.000Z",
+    "validators": {{ groups['all'] | map('extract', hostvars) | list | json_query('[*].{ name: inventory_hostname, amount: amount, pub_key: [amount, ec2_tag_public_key] }') | to_json }}
+}

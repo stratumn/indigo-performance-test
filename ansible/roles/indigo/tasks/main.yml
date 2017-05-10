@@ -1,0 +1,48 @@
+---
+- name: Create Tendermint root directory
+  file:
+    path: /data/tendermint
+    state: directory
+
+- name: Copy Tendermint initialisation files
+  template:
+    dest: "/data/tendermint/{{ item }}"
+    src: "{{ item }}.j2"
+  with_items:
+    - config.toml
+    - genesis.json
+
+- name: Copy Tendermint private key
+  template:
+    force: no
+    dest: "/data/tendermint/priv_validator.json"
+    src: "priv_validator.json.j2"
+
+- name: Create project directory
+  file:
+    path: "{{ indigo_dir }}"
+    state: directory
+
+- name: Copy agent
+  synchronize:
+    dest: "{{ indigo_dir }}"
+    src: ../../../../agent
+
+- name: Copy dial seed script
+  template:
+    dest: "{{ indigo_dir }}/dial.sh"
+    src: dial.sh.j2
+    mode: "0774"
+
+- name: Copy compose files
+  template:
+    dest: "{{ indigo_dir }}/docker-compose.yml"
+    src:  docker-compose.yml.j2
+
+- name: Deploy app services
+  docker_service:
+    project_name: indigo
+    project_src: "{{ indigo_dir }}/"
+    restarted: yes
+    files:
+      - docker-compose.yml

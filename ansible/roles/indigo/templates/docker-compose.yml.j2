@@ -1,0 +1,35 @@
+version: '2'
+services:
+  indigoexplorer:
+    image: stratumn/indigo-explorer:v0.5.0
+    ports:
+    - "4000:4000"
+  agent:
+    build:
+      dockerfile: Dockerfile.dev
+      context: agent
+    ports:
+    - "3000:3000"
+    depends_on:
+    - store
+  store:
+    image: stratumn/tmstore:0.0.8-dev
+    command: [tmstore, -endpoint, "tcp://tmapp:46657"]
+    depends_on:
+    - tmapp
+  tmapp:
+    image: stratumn/filetmpop:0.0.8-dev
+    ports:
+    - 46656:46656
+    - 46657:46657
+    volumes:
+    - /data/tendermint:/data/tendermint
+    - /var/stratumn/filestore:/var/stratumn/filestore
+    extra_hosts:
+    {% for host in groups['ec2'] %}
+      - "{{ host }}:{{ hostvars[host].ec2_ip_address }}"
+    {% endfor %}
+    # meant as a temporary workaround so that tendermint can write in /data/tendermint
+    user: root
+volumes:
+  mongo-data:

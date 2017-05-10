@@ -4,19 +4,20 @@ require 'yaml'
 Vagrant.require_version '>= 1.6.0'
 VAGRANTFILE_API_VERSION = '2'.freeze
 
-PRIVATE_KEY_PATH = 'indigotests.pem'.freeze
+PRIVATE_KEY_PATH = 'indigo_tests.pem'.freeze
 NETWORK_SIZE = 2
 
-File.open(PRIVATE_KEY_PATH, 'w') do |f|
-  f.write(ENV['INDIGO_TESTS_PEM'].split('\n').join("\n"))
+unless File.exist?(PRIVATE_KEY_PATH)
+  File.open(PRIVATE_KEY_PATH, 'w', 0o600) do |f|
+    f.write(ENV['INDIGO_TESTS_PEM'].split('\n').join("\n"))
+  end
 end
 
-# Create boxes
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   keys = YAML.load(IO.read('keys.yml'))
 
   1.upto(NETWORK_SIZE) do |i|
-    name = "indigo-tests-#{i}"
+    name = "indigo_tests_#{i}"
 
     config.vm.define name do |srv|
       srv.vm.box = 'aws-dummy'
@@ -26,13 +27,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         aws.access_key_id = ENV['AWS_ACCESS_KEY_ID']
         aws.secret_access_key = ENV['AWS_SECRET_ACCESS_KEY']
 
-        # Specify SSH keypair to use
         aws.keypair_name = 'indigo.tests'
-
-        # Specify region, AMI ID, and security group(s)
         aws.region = 'eu-west-1'
-        # Ubuntu 16.04
-        aws.ami = 'ami-405f7226'
+        aws.ami = 'ami-405f7226' # Ubuntu 16.04
         aws.security_groups = ['sg-25e3ad5c']
         aws.subnet_id = 'subnet-afa941e6'
         aws.associate_public_ip = true
@@ -44,7 +41,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
         aws.tags = keys[i].merge(
           Name: name,
-          Type: 'indigo-tests'
+          Type: 'indigo_tests'
         )
       end
     end

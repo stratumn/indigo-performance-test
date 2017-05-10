@@ -1,0 +1,16 @@
+# This is a TOML config file.
+# For more information, see https://github.com/toml-lang/toml
+
+proxy_app = "tcp://tmapp:46658"
+moniker = "{{ inventory_hostname }}"
+node_laddr = "tcp://0.0.0.0:46656"
+seeds = ""
+fast_sync = true
+db_backend = "leveldb"
+log_level = "info"
+rpc_laddr = "tcp://0.0.0.0:46657"
+# timeout_commit = 10000
+# timeout_propose_delta = 1000
+# timeout_prevote_delta = 1000
+# timeout_precommit_delta = 1000
+

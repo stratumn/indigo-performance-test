@@ -7,5 +7,9 @@ install:
   - sudo dpkg -i /tmp/vagrant.deb
   - vagrant plugin install vagrant-aws
   - vagrant box add aws-dummy dummy.box
-script: vagrant up
+  - sudo apt-get install software-properties-common
+  - sudo apt-add-repository ppa:ansible/ansible && sudo apt-get update && sudo apt-get install ansible
+script:
+  - vagrant up
+  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/indigo.yml --private-key=indigo_tests.pem
 after_script: vagrant destroy --froce
