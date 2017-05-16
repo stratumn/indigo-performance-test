@@ -7,9 +7,12 @@ install:
   - sudo dpkg -i /tmp/vagrant.deb
   - vagrant plugin install vagrant-aws
   - vagrant box add aws-dummy dummy.box
-  - sudo apt-get install software-properties-common
-  - sudo apt-add-repository ppa:ansible/ansible && sudo apt-get update && sudo apt-get install ansible
+  - sudo apt-get install software-properties-common jmeter
+  - sudo apt-add-repository -y ppa:ansible/ansible && sudo apt-get update && sudo apt-get install -y ansible
 script:
   - vagrant up
+  # as a workaround to ansible reset_connection not working we execute the docker role first so that the ubuntu user belongs to the
+  # docker group once the indigo role is run.
+  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/docker.yml --private-key=indigo_tests.pem
   - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/indigo.yml --private-key=indigo_tests.pem
-after_script: vagrant destroy --froce
+after_script: vagrant destroy --force

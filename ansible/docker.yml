@@ -9,4 +9,5 @@
 
 - hosts: tag_Type_indigo_tests
   roles:
-    - indigo
+    - docker
+  become: yes

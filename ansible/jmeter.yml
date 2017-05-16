@@ -9,4 +9,7 @@
 
 - hosts: tag_Type_indigo_tests
   roles:
-    - indigo
+    - role: jmeter
+      jmeter_serveragent_enabled: yes
+      jmeter_url: "https://archive.apache.org/dist/jmeter/binaries/{{ jmeter_archive }}"
+      user: ubuntu

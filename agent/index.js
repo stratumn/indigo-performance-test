@@ -10,7 +10,7 @@ var actions = require('./lib/actions');
 
 // Create an HTTP store client to save segments.
 // Assumes an HTTP store server is available on env.STRATUMN_STORE_URL or http://store:5000.
-var storeHttpClient = Agent.storeHttpClient(process.env.STRATUMN_STORE_URL || 'http://store-1:5000');
+var storeHttpClient = Agent.storeHttpClient(process.env.STRATUMN_STORE_URL || 'http://store:5000');
 // Do not use a fossilizer.
 var fossilizerHttpClient = null;
 

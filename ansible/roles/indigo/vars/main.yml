@@ -1,2 +1,3 @@
 ---
 indigo_dir: "{{ ansible_env.HOME }}/indigo"
+tendermint_dir: "{{ indigo_dir }}/tendermint"

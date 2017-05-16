@@ -4,6 +4,15 @@
     name: docker-compose
     version: "1.9.0"
 
+- name: Add user to docker group
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes
+
+# - name: Reset ssh connection to allow user changes to affect 'current login user'
+#   meta: reset_connection
+
 - name: Start docker service
   service:
     name: docker
