@@ -1,0 +1,15 @@
+---
+- hosts: tag_Type_indigo_tests
+  roles:
+    - indigo
+
+- hosts:
+    - tag_Type_indigo_tests_controller
+    - tag_Type_indigo_tests
+  roles:
+    - jmeter
+
+- hosts: tag_Type_indigo_tests_controller
+  tasks:
+    - name: Run jmeter
+      command: jmeter -n -r -t /vagrant/indigo.jmx -l indigo.jtl

@@ -1,128 +1,149 @@
 ---
-- name: Install jmeter
+- name: Install dependencies
   apt:
-    pkg: jmeter
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - unzip
+    - default-jre
+  become: true
+
+- name: Create jmeter src directory
+  file:
+    path: "{{ jmeter_src_dir }}"
+    state: directory
+  tags: jmeter_setup
+
+- name: Create jmeter directory
+  file:
+    path: "{{ jmeter_base_dir }}"
+    state: directory
+  become: yes
+  tags: jmeter_setup
+
+#jmeter
+- name: Copy jmeter
+  copy:
+    src: "{{ jmeter_archive }}"
+    dest: "{{ jmeter_src_dir }}/"
+  register: jmeter_copied
+  tags: jmeter_setup
+
+- name: Extract archive jmeter
+  unarchive:
+    src: "{{ jmeter_src_dir }}/{{ jmeter_archive }}"
+    dest: "{{ jmeter_root_dir }}"
+    copy: no
+  when: jmeter_copied.changed
+  tags: jmeter_setup
   become: yes
 
-- name: Create temporary directory
-  shell: mktemp -d
-  register: tempdir
-  become: true
-  tags: jmeter_setup
+- name: Configure jmeter
+  template:
+    src: jmeter.properties.j2
+    dest: "{{ jmeter_base_dir }}/bin/jmeter.properties"
+  become: yes
+
+- name: Add jmeter to path
+  file:
+    src: "{{ jmeter_base_dir }}/bin/{{ item }}"
+    path: /usr/local/bin/{{item }}
+    state: link
+  with_items:
+    - jmeter
+    - jmeter-server
+  become: yes
 
 #jmeter plugins standard
-# - name: jmeter | Download jmeter plugins standard
-#   get_url:
-#     url="{{ jmeter_plugins_standard_url }}"
-#     dest="{{ jmeter_dir_tmp }}/"
-#   register: jmeter_plugins_standard_download
-#   when: jmeter_plugins_standard_enabled
-#   tags: jmeter_setup
-
-# - name: jmeter | Extract archive jmeter plugins standard
-#   command: chdir={{jmeter_base_dir}}/{{ jmeter_name }}  /usr/bin/unzip -o -q {{ jmeter_dir_tmp }}/{{ jmeter_plugins_standard_archive }}
-# #  when: jmeter_plugins_standard_download.changed and jmeter_plugins_standard_enabled
-#   when: jmeter_plugins_standard_enabled
-#   tags: jmeter_setup
-
-# #jmeter plugins extras
-# - name: jmeter | Download jmeter plugins extras
-#   get_url:
-#     url="{{ jmeter_plugins_extras_url }}"
-#     dest="{{ jmeter_dir_tmp }}/"
-#   register: jmeter_plugins_extras_download
-#   when: jmeter_plugins_extras_enabled
-#   tags: jmeter_setup
-
-# - name: jmeter | Extract archive jmeter plugins extras
-#   command: chdir={{jmeter_base_dir}}/{{ jmeter_name }}  /usr/bin/unzip -o -q {{ jmeter_dir_tmp }}/{{ jmeter_plugins_extras_archive }}
-# #  when: jmeter_plugins_extras_download.changed and jmeter_plugins_extras_enabled
-#   when: jmeter_plugins_extras_enabled
-#   tags: jmeter_setup
-
-# #jmeter plugins extraslibs
-# - name: jmeter | Download jmeter plugins extraslibs
-#   get_url:
-#     url="{{ jmeter_plugins_extraslibs_url }}"
-#     dest="{{ jmeter_dir_tmp }}/"
-#   register: jmeter_plugins_extraslibs_download
-#   when: jmeter_plugins_extraslibs_enabled
-#   tags: jmeter_setup
-
-# - name: jmeter | Extract archive jmeter plugins extraslibs
-#   command: chdir={{jmeter_base_dir}}/{{ jmeter_name }}  /usr/bin/unzip -o -q {{ jmeter_dir_tmp }}/{{ jmeter_plugins_extraslibs_archive }}
-# #  when: jmeter_plugins_extraslibs_download.changed and jmeter_plugins_extraslibs_enabled
-#   when: jmeter_plugins_extraslibs_enabled
-#   tags: jmeter_setup
-
-# #jmeter plugins webdriver
-# - name: jmeter | Download jmeter plugins webdriver
-#   get_url:
-#     url="{{ jmeter_plugins_webdriver_url }}"
-#     dest="{{ jmeter_dir_tmp }}/"
-#   register: jmeter_plugins_webdriver_download
-#   when: jmeter_plugins_webdriver_enabled
-#   tags: jmeter_setup
-
-# - name: jmeter | Extract archive jmeter plugins webdriver
-#   command: chdir={{jmeter_base_dir}}/{{ jmeter_name }}  /usr/bin/unzip -o -q {{ jmeter_dir_tmp }}/{{ jmeter_plugins_webdriver_archive }}
-# #  when: jmeter_plugins_webdriver_download.changed and jmeter_plugins_webdriver_enabled
-#   when: jmeter_plugins_webdriver_enabled
-#   tags: jmeter_setup
-
-# #jmeter plugins hadoop
-# - name: jmeter | Download jmeter plugins hadoop
-#   get_url:
-#     url="{{ jmeter_plugins_hadoop_url }}"
-#     dest="{{ jmeter_dir_tmp }}/"
-#   register: jmeter_plugins_hadoop_download
-#   when: jmeter_plugins_hadoop_enabled
-#   tags: jmeter_setup
-
-# - name: jmeter | Extract archive jmeter plugins hadoop
-#   command: chdir={{jmeter_base_dir}}/{{ jmeter_name }}  /usr/bin/unzip -o -q {{ jmeter_dir_tmp }}/{{ jmeter_plugins_hadoop_archive }}
-# #  when: jmeter_plugins_hadoop_download.changed and jmeter_plugins_hadoop_enabled
-#   when: jmeter_plugins_hadoop_enabled
-#   tags: jmeter_setup
-
-#jmeter serveragent
-- name: Create base directory
-  file:
-    dest="{{jmeter_serveragent_base_dir}}"
-    state=directory
-    owner="{{jmeter_owner}}"
-    group="{{jmeter_group}}"
-  become : yes
+- name: Copy jmeter plugins standard
+  copy:
+    src: "{{ jmeter_plugins_standard_archive }}"
+    dest: "{{ jmeter_src_dir }}/"
+  register: jmeter_plugins_standard_copied
+  when: jmeter_plugins_standard_enabled
   tags: jmeter_setup
 
-- name: jmeter | Create base directory for serveragent
+- name: Extract archive jmeter plugins standard
+  unarchive:
+    src: "{{ jmeter_src_dir }}/{{ jmeter_plugins_standard_archive }}"
+    dest: "{{ jmeter_base_dir }}"
+    copy: no
+#    owner="{{ jmeter_owner }}"
+#    group="{{ jmeter_group }}"
+  when: jmeter_plugins_standard_copied.changed and jmeter_plugins_standard_enabled
+  tags: jmeter_setup
+  become: yes
+
+#jmeter plugins extras
+- name: Copy jmeter plugins extras
+  copy:
+    src: "{{ jmeter_plugins_extras_archive }}"
+    dest: "{{ jmeter_src_dir }}/"
+  register: jmeter_plugins_extras_copied
+  when: jmeter_plugins_extras_enabled
+  tags: jmeter_setup
+
+- name: Extract archive jmeter plugins extras
+  unarchive:
+    src: "{{ jmeter_src_dir }}/{{ jmeter_plugins_extras_archive }}"
+    dest: "{{ jmeter_base_dir }}"
+    copy: no
+#    owner="{{ jmeter_owner }}"
+#    group="{{ jmeter_group }}"
+  when: jmeter_plugins_extras_copied.changed and jmeter_plugins_extras_enabled
+  tags: jmeter_setup
+  become: yes
+
+#jmeter plugins extraslibs
+- name: Copy jmeter plugins extraslibs
+  copy:
+    src: "{{ jmeter_plugins_extraslibs_archive }}"
+    dest: "{{ jmeter_src_dir }}/"
+  register: jmeter_plugins_extraslibs_copied
+  when: jmeter_plugins_extraslibs_enabled
+  tags: jmeter_setup
+
+- name: jmeter | Extract archive jmeter plugins extraslibs
+  unarchive:
+    src: "{{ jmeter_src_dir }}/{{ jmeter_plugins_extraslibs_archive }}"
+    dest: "{{ jmeter_base_dir }}"
+    copy: no
+#    owner="{{ jmeter_owner }}"
+#    group="{{ jmeter_group }}"
+  when: jmeter_plugins_extraslibs_copied.changed and jmeter_plugins_extraslibs_enabled
+  tags: jmeter_setup
+  become: yes
+
+#jmeter serveragent
+- name: Create base directory for serveragent
   file:
-    dest="{{jmeter_serveragent_base_dir}}"
-    state=directory
+    dest: "{{ jmeter_serveragent_base_dir }}"
+    state: directory
   when: jmeter_serveragent_enabled
   tags: jmeter_setup
   become: yes
 
-- name: Download jmeter serveragent
-  get_url:
-    url="{{ jmeter_serveragent_url }}"
-    dest="{{ jmeter_dir_tmp }}/"
-  register: jmeter_serveragent_download
+- name: Copy jmeter serveragent
+  copy:
+    src: "{{ jmeter_serveragent_archive }}"
+    dest: "{{ jmeter_src_dir }}/"
+  register: jmeter_serveragent_copied
   when: jmeter_serveragent_enabled
   tags: jmeter_setup
 
 - name: Extract archive jmeter server agent
   unarchive:
     copy: no
-    src: "{{ jmeter_dir_tmp }}/{{ jmeter_serveragent_archive }}"
+    src: "{{ jmeter_src_dir }}/{{ jmeter_serveragent_archive }}"
     dest: "{{ jmeter_serveragent_base_dir }}"
-  when: jmeter_serveragent_download.changed
+  # when: jmeter_serveragent_copied.changed
   tags: jmeter_setup
+  become: yes
 
 - name: Add jmeter-agent service
-  copy:
-    src: jmeter-agent.service
-    dest:  /etc/systemd/system/
+  template:
+    src: jmeter-agent.service.j2
+    dest:  /etc/systemd/system/jmeter-agent.service
     mode: 0777
   when: jmeter_serveragent_enabled
   become: yes
@@ -135,15 +156,31 @@
   when: jmeter_serveragent_enabled
   become: yes
 
-#- name: jmeter | Ensure Jmeter restarted
-#  service: name=jmeter state=restarted
-#  when: jmeter_configure.changed
+- name: Configure jmeter remote_hosts
+  lineinfile:
+    dest: "{{ jmeter_base_dir }}/bin/jmeter.properties"
+    # dest: /usr/local/Cellar/jmeter/3.1/libexec/bin/jmeter.properties
+    regexp: ^remote_hosts=.*
+    line: remote_hosts={{ groups['tag_Type_indigo_tests'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',') }}
+  delegate_to: indigo_tests_controller
+  run_once: true
+  become: true
 
-- name: jmeter | Cleanup temporary directory
-  file: name={{ tempdir.stdout }} state=absent
-  tags: jmeter_setup
+- name: Add jmeter-server service
+  template:
+    src: jmeter-server.service.j2
+    dest: /etc/systemd/system/jmeter-server.service
+    mode: 0777
   become: yes
+  when: inventory_hostname in groups['tag_Type_indigo_tests']
+
+- name: Start the jmeter-server service
+  service:
+    name: jmeter-server
+    state: restarted
+    enabled: yes
+  become: yes
+  when: inventory_hostname in groups['tag_Type_indigo_tests']
 
 # - debug: msg=" jmeter | Start jmeter agent {{jmeter_serveragent_base_dir}}/startAgent.sh"
 # - debug: msg=" jmeter | Start jmeter {{jmeter_base_dir}}/{{ jmeter_name }}/bin/jmeter"
-

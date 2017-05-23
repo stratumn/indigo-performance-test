@@ -2,6 +2,12 @@
 dist: trusty
 sudo: required
 #language: javascript
+env:
+  global:
+  - JMETER_RMI_PORT=3333
+  matrix:
+  - NETWORK_SIZE=2
+  - NETWORK_SIZE=10
 install:
   - wget -O /tmp/vagrant.deb https://releases.hashicorp.com/vagrant/1.9.4/vagrant_1.9.4_x86_64.deb
   - sudo dpkg -i /tmp/vagrant.deb
@@ -9,10 +15,12 @@ install:
   - vagrant box add aws-dummy dummy.box
   - sudo apt-get install software-properties-common jmeter
   - sudo apt-add-repository -y ppa:ansible/ansible && sudo apt-get update && sudo apt-get install -y ansible
+  - pip install boto
 script:
   - vagrant up
   # as a workaround to ansible reset_connection not working we execute the docker role first so that the ubuntu user belongs to the
   # docker group once the indigo role is run.
-  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/docker.yml --private-key=indigo_tests.pem
-  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/indigo.yml --private-key=indigo_tests.pem
+  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/init.yml --private-key=indigo_tests.pem
+  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/indigo-test.yml --private-key=indigo_tests.pem
+  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/configure-hosts.yml --private-key=indigo_tests.pem
 after_script: vagrant destroy --force

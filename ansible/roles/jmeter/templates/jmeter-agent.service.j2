@@ -1,0 +1,13 @@
+[Unit]
+Description=My Miscellaneous Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/usr/local/jmeter-agent/startAgent.sh
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

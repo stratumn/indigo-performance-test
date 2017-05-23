@@ -1,3 +1,5 @@
 indigo_tests.pem
 .vagrant
 ansible/**/*.retry
+*.log
+.DS_Store

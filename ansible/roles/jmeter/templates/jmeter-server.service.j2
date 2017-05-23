@@ -1,0 +1,13 @@
+[Unit]
+Description=jmeter server
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/usr/local/bin/jmeter-server
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
