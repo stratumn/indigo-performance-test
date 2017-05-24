@@ -5,15 +5,16 @@
   with_items:
     - apt-transport-https
     - ca-certificates
+    - gnupg-curl
 
 - name: Install docker GPG key
-  apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D state=present
+  apt_key: keyserver=https://download.docker.com/linux/ubuntu/gpg id=9DC858229FC7DD38854AE2D88D81803C0EBFCD88 state=present
   tags:
     - docker
     - gpg_key
 
 - name: Add docker apt repository
-  apt_repository: repo="deb https://apt.dockerproject.org/repo {{ ansible_distribution|lower }}-{{ ansible_distribution_release }} main" state=present
+  apt_repository: repo="deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" state=present
   tags:
     - docker
     - apt_repository
@@ -24,19 +25,8 @@
     - docker
     - apt_cache
 
-- name: Purge the old repo if it exists
-  apt: name={{ item }} purge=yes
-  with_items:
-    - "lxc-docker*"
-    - "docker.io*"
-  ignore_errors: yes
-  tags:
-    - docker
-    - apt_purge
-
 - name: Install docker package
-  apt: name=docker-engine state=present
-  notify: Start Docker
+  apt: name=docker-ce state=present
   tags:
     - docker
     - install

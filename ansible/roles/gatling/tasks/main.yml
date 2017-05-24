@@ -1,0 +1,25 @@
+---
+- name: Install deps
+  apt:
+    pkg: "{{ item }}"
+  with_items:
+    - unzip
+    - default-jre
+  become: yes
+
+- name: Extract Gatling
+  unarchive:
+    remote_src: yes
+    src: "{{ gatling_url }}"
+    dest: "{{ gatling_base_dir }}"
+
+- name: Move to gatling
+  command: creates={{ gatling_home }} mv {{ gatling_base_dir}}/{{ gatling_original_dir }} {{ gatling_home }}
+
+- name: Make gatling simulations directory
+  file:
+    path: "{{ gatling_simulations_dir }}"
+    state: directory
+
+- include: controller.yml
+  when: inventory_hostname in groups['tag_Type_indigo_tests_controller']

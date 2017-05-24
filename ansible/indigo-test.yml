@@ -1,15 +1,25 @@
 ---
+- hosts: all
+  gather_facts: no
+  become: true
+  pre_tasks:
+    # Needed in Ubuntu 16.04 (that bundles python3)
+    - name: Install python2
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+    - name: Install inotifywait
+      apt:
+        pkg: inotify-tools
+
+- hosts: all
+  become: true
+  roles:
+    - ansible-role-hostname
+
 - hosts: tag_Type_indigo_tests
   roles:
     - indigo
 
-- hosts:
-    - tag_Type_indigo_tests_controller
-    - tag_Type_indigo_tests
+- hosts: all
   roles:
-    - jmeter
-
-- hosts: tag_Type_indigo_tests_controller
-  tasks:
-    - name: Run jmeter
-      command: jmeter -n -r -t /vagrant/indigo.jmx -l indigo.jtl
+    - gatling

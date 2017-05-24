@@ -1,0 +1,18 @@
+---
+- name: Copy run script
+  copy:
+    src: run_gatling.sh
+    dest: /home/ubuntu
+    mode: 0775
+
+- name: Copy simulations
+  copy:
+    src: ../../../simulations/
+    dest: "{{ gatling_simulations_dir }}"
+
+- name: Copy private key
+  copy:
+    src: ../../../indigo_tests.pem
+    dest: ~/.ssh
+    mode: 0600
+

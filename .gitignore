@@ -3,3 +3,5 @@ indigo_tests.pem
 ansible/**/*.retry
 *.log
 .DS_Store
+results
+report

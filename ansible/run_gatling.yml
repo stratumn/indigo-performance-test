@@ -1,0 +1,15 @@
+---
+- hosts: tag_Type_indigo_tests_controller
+  roles:
+    - gatling
+
+- hosts: tag_Type_indigo_tests_controller
+  tasks:
+    - name: Run gatling
+      command: /home/ubuntu/run_gatling.sh
+
+    - name: Download report
+      synchronize:
+        src: /home/ubuntu/gatling/results/report
+        dest: ../report
+        mode: pull

@@ -1,26 +1,27 @@
----
 dist: trusty
 sudo: required
-#language: javascript
 env:
-  global:
-  - JMETER_RMI_PORT=3333
   matrix:
   - NETWORK_SIZE=2
   - NETWORK_SIZE=10
 install:
-  - wget -O /tmp/vagrant.deb https://releases.hashicorp.com/vagrant/1.9.4/vagrant_1.9.4_x86_64.deb
-  - sudo dpkg -i /tmp/vagrant.deb
-  - vagrant plugin install vagrant-aws
-  - vagrant box add aws-dummy dummy.box
-  - sudo apt-get install software-properties-common jmeter
-  - sudo apt-add-repository -y ppa:ansible/ansible && sudo apt-get update && sudo apt-get install -y ansible
-  - pip install boto
+- wget -O /tmp/vagrant.deb https://releases.hashicorp.com/vagrant/1.9.4/vagrant_1.9.4_x86_64.deb
+- sudo dpkg -i /tmp/vagrant.deb
+- vagrant plugin install vagrant-aws
+- vagrant box add aws-dummy dummy.box
+- pip install ansible boto six jmespath
 script:
-  - vagrant up
-  # as a workaround to ansible reset_connection not working we execute the docker role first so that the ubuntu user belongs to the
-  # docker group once the indigo role is run.
-  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/init.yml --private-key=indigo_tests.pem
-  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/indigo-test.yml --private-key=indigo_tests.pem
-  - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/configure-hosts.yml --private-key=indigo_tests.pem
+- vagrant up
+- ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/indigo-test.yml
+  --private-key=indigo_tests.pem --limit "*_on_$NETWORK_SIZE"
+- ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/run_gatling.yml
+  --private-key=indigo_tests.pem --limit "*_on_$NETWORK_SIZE"
 after_script: vagrant destroy --force
+deploy:
+  provider: s3
+  access_key_id: AKIAJITD57EH2JL4RX7A
+  secret_access_key:
+    secure: nu2q1UsWHzXQVNLWxnBNaVih80v1SSm1GoUh+nLad26PkKNEi3HKjnteMXII6z6mIkVtJDAlX00bf2s3EOsGdBrx0c2bZ+fox2DIgINy0U+/i7TEKV7Ar2I8/9acUAdF57B/JWba2qkg+yH1yGiVJiDffCCQw0IIVSIx9SWGZTaBIOaiGnxb8G9FcFm0NJXuvzA+dAkEwPJ+Ard663eo5l9nBr4rs5QhgTx2oLzuvH0e7og0NU2V0/6Ek0njHtX0dWCdiNIbT3Yel1w8mK9jokMIlr7M5DZ+DwRaVGz6JqIN/rdg8mbrNoE08abVmMD0hMIwLieLlXuqEihYu9Vo6H8MCdOGwlNWwPIorkJ1wUq6MKeKdX/TqGVf920ivZ1SR6UpXaES4xtkdiaLci2ol8gNKcH1r5ddPhuHXt8mMqZeO4w+VWrwym8yPolB0Z09U85YXXhauQ3FPHxe2am/GfU2c7a+dIBfwo2sOtsKcL1IbCH0z0F4G3sN9uAZimUv7xVHWM2NwTPdYupdWrEQ61/SqzSiM5TXiSDr4tc7kny4ohPn47xRo37gLhSliY1bwHEcX/fmxrnUryTIFVBJ7qPd2dmIZwuHgnrrR+goRYY/5PumhAlWd7tQVG2l84NLyTGgI6/E3MT6LBr0YDKnt1TpqZGdBeFbjJpaMT8bG2I=
+  bucket: indigo-performance-test
+  region: eu-west-1
+  local_dir: report
