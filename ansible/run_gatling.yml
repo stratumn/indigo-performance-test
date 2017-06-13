@@ -1,15 +1,47 @@
 ---
-- hosts: tag_Type_indigo_tests_controller
+- hosts: all
   roles:
     - gatling
 
+- hosts: all
+  tasks:
+    - name: Cleaning previous runs
+      file:
+        path: "{{ gatling_results_dir }}"
+        state: absent
+
+    - name: Creating report dir
+      file:
+        path: "{{ gatling_report_dir }}"
+        state: directory
+
+- hosts: tag_Type_indigo_tests
+  tasks:
+    - name: Copy simulations
+      copy:
+        src: ../simulations/
+        dest: "{{ gatling_simulations_dir }}"
+
+    - name: Running simulations
+      command: "{{ gatling_runner }} --no-reports --simulation {{ simulation_name }} --output-name report"
+
+    - name: Rename result files
+      shell: ls -t {{ gatling_results_dir }} | head -n 1 | xargs -I {} mv {{ gatling_results_dir }}/{}/simulation.log {{ gatling_report_dir }}/simulation-{{ inventory_hostname }}.log
+
+    - name: Gathering result files
+      synchronize:
+        src: "{{ gatling_report_dir }}"
+        dest: "{{ gatling_report_dir }}"
+        mode: pull
+      delegate_to: "{{ groups['tag_Type_indigo_tests_controller'][0] }}"
+
 - hosts: tag_Type_indigo_tests_controller
   tasks:
-    - name: Run gatling
-      command: /home/ubuntu/run_gatling.sh
+    - name: Aggregating simulations
+      command: "{{ gatling_runner }} --reports-only report"
 
     - name: Download report
       synchronize:
-        src: /home/ubuntu/gatling/results/report
+        src: "{{ gatling_home }}/results/report/"
         dest: ../report
         mode: pull

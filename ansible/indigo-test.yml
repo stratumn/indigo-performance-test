@@ -19,7 +19,3 @@
 - hosts: tag_Type_indigo_tests
   roles:
     - indigo
-
-- hosts: all
-  roles:
-    - gatling

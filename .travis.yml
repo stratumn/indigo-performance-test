@@ -12,6 +12,7 @@ install:
 - pip install ansible boto six jmespath
 script:
 - vagrant up
+- ssh-add indigo_tests.pem
 - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/indigo-test.yml
   --private-key=indigo_tests.pem --limit "*_on_$NETWORK_SIZE"
 - ansible-playbook --inventory ansible/contrib/inventory/ec2.py --user ubuntu ansible/run_gatling.yml

@@ -1,2 +1,9 @@
 ---
 amount: 1
+gatling_base_dir: "/home/ubuntu"
+gatling_home: "{{ gatling_base_dir }}/gatling"
+gatling_simulations_dir: "{{ gatling_home }}/user-files/simulations"
+gatling_results_dir: "{{ gatling_home }}/results"
+gatling_report_dir: "{{ gatling_results_dir }}/report"
+gatling_runner: "{{ gatling_home}}/bin/gatling.sh"
+simulation_name: indigo.IndigoSimulation

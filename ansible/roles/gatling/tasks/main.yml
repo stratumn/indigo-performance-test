@@ -20,6 +20,3 @@
   file:
     path: "{{ gatling_simulations_dir }}"
     state: directory
-
-- include: controller.yml
-  when: inventory_hostname in groups['tag_Type_indigo_tests_controller']
