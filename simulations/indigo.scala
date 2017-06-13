@@ -18,6 +18,6 @@ class IndigoSimulation extends Simulation {
     )
 
   setUp(createMap.inject(
-    constantUsersPerSec(10) during(1 minute)
+    constantUsersPerSec(100) during(1 minute)
   ).protocols(httpConf))
 }

@@ -7,10 +7,6 @@
     - name: Install python2
       raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
 
-    - name: Install inotifywait
-      apt:
-        pkg: inotify-tools
-
 - hosts: all
   become: true
   roles:

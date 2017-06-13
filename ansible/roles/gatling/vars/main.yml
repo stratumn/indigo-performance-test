@@ -3,4 +3,3 @@ gatling_version: "2.2.5"
 gatling_archive : "gatling-charts-highcharts-bundle-{{ gatling_version }}-bundle"
 gatling_url     : "https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/{{ gatling_version }}/{{ gatling_archive }}.zip"
 gatling_original_dir: gatling-charts-highcharts-bundle-{{ gatling_version }}
-gatling_runner: "{{ gatling_home }}/bin/gatling.sh"
