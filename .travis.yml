@@ -26,3 +26,5 @@ deploy:
   bucket: indigo-performance-test
   region: eu-west-1
   local_dir: report
+  skip_cleanup: true
+  upload-dir: $TRAVIS_BUILD_NUMBER-$NETWORK_SIZE
