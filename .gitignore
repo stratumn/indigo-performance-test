@@ -5,3 +5,5 @@ ansible/**/*.retry
 .DS_Store
 results
 report
+report_sav/
+logs

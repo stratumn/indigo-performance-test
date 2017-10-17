@@ -23,11 +23,16 @@
     dest: "{{ tendermint_dir }}/priv_validator.json"
     src: "priv_validator.json.j2"
 
+- name: Copy Proof Of Process validation rules
+  copy:
+    dest: "{{ tendermint_dir }}"
+    src: ../files/validation_rules.json
+
 - name: Copy agent
   synchronize:
     dest: "{{ indigo_dir }}"
     src: ../../../../agent
-
+    
 - name: Copy dial seed script
   template:
     dest: "{{ indigo_dir }}/dial.sh"
@@ -38,6 +43,18 @@
   template:
     dest: "{{ indigo_dir }}/docker-compose.yml"
     src:  docker-compose.yml.j2
+
+# - name: Remove blockchain history
+#   command: "rm -rf {{ tendermint_dir }}/data /var/stratumn/filestore/"
+#   become: true
+#   become_method: sudo
+#   become_user: root
+
+# - name: Remove blockchain history
+#   file:
+#     path: "{{ tendermint_dir }}/data"
+#     state: absent
+#     seuser: root
 
 - name: Deploy app services
   docker_service:

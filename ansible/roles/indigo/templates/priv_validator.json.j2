@@ -3,12 +3,12 @@
 	"last_height": 0,
 	"last_round": 0,
 	"last_step": 0,
-	"priv_key": [
-		1,
-		"{{ ec2_tag_private_key }}"
-	],
-	"pub_key": [
-		1,
-		"{{ ec2_tag_public_key }}"
-	]
+	"priv_key": {
+		"type": "{{key_type}}",
+		"data": "{{ ec2_tag_private_key }}"
+	},
+	"pub_key": {
+		"type": "{{key_type}}",
+		"data": "{{ ec2_tag_public_key }}"
+	}
 }

@@ -2,5 +2,5 @@
     "app_hash": "",
     "chain_id": "indigo-tests",
     "genesis_time": "2017-01-01T00:00:00.000Z",
-    "validators": {{ groups['tag_Type_indigo_tests'] | map('extract', hostvars) | list | json_query('[*].{ name: inventory_hostname, amount: amount, pub_key: [amount, ec2_tag_public_key] }') | to_json }}
+    "validators": {{ groups['tag_Type_indigo_tests'] | map('extract', hostvars) | list | json_query('[*].{ name: inventory_hostname, amount: amount, power: validator_power, pub_key: {data: ec2_tag_public_key, type: key_type} }') | to_json }}
 }

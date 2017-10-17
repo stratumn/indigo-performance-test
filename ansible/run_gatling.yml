@@ -22,11 +22,44 @@
         src: ../simulations/
         dest: "{{ gatling_simulations_dir }}"
 
+    - name: Install tcconfig
+      pip:
+        name: tcconfig
+      become: true
+      become_user: root
+      become_method: sudo
+        
+    - name: Limit bandwidth
+      shell: "tcset --device eth0 {{ eth_limits }}"
+      when: not(
+          (eth_limits is undefined)
+          or
+          (eth_limits is none)
+          or
+          (eth_limits | trim == '')
+        )
+      become: true
+      become_user: root
+      become_method: sudo
+
     - name: Running simulations
       command: "{{ gatling_runner }} --no-reports --simulation {{ simulation_name }} --output-name report"
 
     - name: Rename result files
       shell: ls -t {{ gatling_results_dir }} | head -n 1 | xargs -I {} mv {{ gatling_results_dir }}/{}/simulation.log {{ gatling_report_dir }}/simulation-{{ inventory_hostname }}.log
+
+    - name: Unlimit bandwidth
+      shell: "tcdel --device eth0"
+      when: not(
+          (eth_limits is undefined)
+          or
+          (eth_limits is none)
+          or
+          (eth_limits | trim == '')
+        )
+      become: true
+      become_user: root
+      become_method: sudo
 
     - name: Gathering result files
       synchronize:
@@ -44,4 +77,18 @@
       synchronize:
         src: "{{ gatling_home }}/results/report/"
         dest: ../report
+        mode: pull
+
+- hosts: tag_Type_indigo_tests
+  tasks:
+    - name: Generate TMPoP logs
+      shell: "docker logs indigo_tmapp_1 > {{ gatling_indigo_dir }}/{{ inventory_hostname }}_tmapp.log 2>&1"
+
+    - name: Generate TMStore logs
+      shell: "docker logs indigo_store_1 > {{ gatling_indigo_dir }}/{{ inventory_hostname }}_store.log 2>&1"
+
+    - name: Download logs
+      synchronize:
+        src: "{{ gatling_indigo_dir }}/{{ inventory_hostname }}_*.log"
+        dest: ../logs
         mode: pull

@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 
 class IndigoSimulation extends Simulation {
 
-  val httpConf = http.baseURL("http://localhost:3000")
+  val httpConf = http.baseURL("http://localhost:3000/ProcessGatling")
 
   val postHeaders = Map("Content-Type" -> "application/x-www-form-urlencoded") // Note the headers specific to a given request
 
@@ -18,6 +18,6 @@ class IndigoSimulation extends Simulation {
     )
 
   setUp(createMap.inject(
-    constantUsersPerSec(100) during(1 minute)
+    constantUsersPerSec(50) during(2 minute)
   ).protocols(httpConf))
 }
