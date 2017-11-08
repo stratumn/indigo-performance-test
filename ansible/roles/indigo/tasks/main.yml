@@ -44,18 +44,6 @@
     dest: "{{ indigo_dir }}/docker-compose.yml"
     src:  docker-compose.yml.j2
 
-# - name: Remove blockchain history
-#   command: "rm -rf {{ tendermint_dir }}/data /var/stratumn/filestore/"
-#   become: true
-#   become_method: sudo
-#   become_user: root
-
-# - name: Remove blockchain history
-#   file:
-#     path: "{{ tendermint_dir }}/data"
-#     state: absent
-#     seuser: root
-
 - name: Deploy app services
   docker_service:
     project_name: indigo

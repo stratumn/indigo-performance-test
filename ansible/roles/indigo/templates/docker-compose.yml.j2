@@ -16,17 +16,13 @@ services:
     - store
   store:
     image: alexppxela/tmstore:latest
-    # image: stratumn/tmstore:latest
     command: [tmstore, -endpoint, "tcp://tmapp:46657"]
     depends_on:
     - tmapp
   tmapp:
-    # image: alexppxela/dummytmpop:latest
-    # command: [dummytmpop, -home, /data/tendermint, -rules_filename, /data/tendermint/validation_rules.json, -unsafe, -max_block_size_txs, 1000]
-    # image: alexppxela/filetmpop:latest
-    # command: [filetmpop, -home, /data/tendermint, -rules_filename, /data/tendermint/validation_rules.json, -log_level, debug, -unsafe]
     image: alexppxela/dummytmpop:latest
     command: [dummytmpop, -home, /data/tendermint, -rules_filename, "", -unsafe]
+    # command: [filetmpop, -home, /data/tendermint, -rules_filename, /data/tendermint/validation_rules.json, -log_level, debug, -unsafe]
     # image: alexppxela/tmdummy:latest
     # command: [tmdummy, -unsafe]
     ports:
