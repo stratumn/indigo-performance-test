@@ -48,7 +48,7 @@ def define_srv(config, name, tags)
 
       aws.keypair_name = 'indigo.tests'
       aws.region = 'eu-west-1'
-      aws.instance_type = 'm3.2xlarge'
+      aws.instance_type = 'm3.medium'
       aws.ami = 'ami-405f7226' # Ubuntu 16.04
       aws.security_groups = ['sg-25e3ad5c']
       aws.subnet_id = 'subnet-afa941e6'
