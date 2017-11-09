@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import string
+import time
 # pycurl does not work on VM
 import subprocess
 
@@ -12,6 +13,8 @@ current_node = "{{inventory_hostname}}"
 {% for host in groups['tag_Type_indigo_tests'] %}
 nodes.append("{{host}}")
 {% endfor %}
+
+time.sleep(1)
 
 for i, host in enumerate(nodes):
     if host != current_node:
