@@ -9,7 +9,7 @@ install:
 - sudo dpkg -i /tmp/vagrant.deb
 - vagrant plugin install vagrant-aws
 - vagrant box add aws-dummy dummy.box
-- pip install ansible boto six jmespath
+- pip install --user ansible boto six jmespath
 script:
 - vagrant up
 - eval $(ssh-agent) && ssh-add indigo_tests.pem
