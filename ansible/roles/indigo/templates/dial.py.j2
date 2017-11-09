@@ -1,5 +1,32 @@
-#!/bin/sh
+#!/usr/bin/python
 
-{% for host in groups['tag_Type_indigo_tests'] if host != inventory_hostname -%}
-    curl --data-urlencode "seeds=[\"{{ host }}:46656\"]" "localhost:46657/dial_seeds"
+import string
+# pycurl does not work on VM
+import subprocess
+
+nodes = []
+P2P_PORT = "46656"
+RPC_PORT = "46657"
+
+current_node = "{{inventory_hostname}}"
+{% for host in groups['tag_Type_indigo_tests'] %}
+nodes.append("{{host}}")
 {% endfor %}
+
+for i, host in enumerate(nodes):
+    if host != current_node:
+        continue
+    seeds = []
+    j = 1
+    for j in range(0, (len(nodes)) / 2):
+        seeds.append(nodes[(i + j + 1) % len(nodes)])
+        if len(nodes) == 2:
+            break
+
+    # print(host + " connects to " + string.join(seeds))
+
+    port_suffix = ":" + P2P_PORT + "\""
+    json_msg = "seeds=[\"" + \
+        string.join(seeds, port_suffix + ", \"") + port_suffix + "]"
+    url = host + ":" + RPC_PORT + "/dial_seeds"
+    subprocess.call(["curl", "--data-urlencode", json_msg, url])
