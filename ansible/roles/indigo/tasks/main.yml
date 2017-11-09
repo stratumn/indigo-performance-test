@@ -32,11 +32,11 @@
   synchronize:
     dest: "{{ indigo_dir }}"
     src: ../../../../agent
-    
+
 - name: Copy dial seed script
   template:
-    dest: "{{ indigo_dir }}/dial.sh"
-    src: dial.sh.j2
+    dest: "{{ indigo_dir }}/dial.py"
+    src: dial.py.j2
     mode: "0774"
 
 - name: Copy compose files
@@ -53,4 +53,4 @@
       - docker-compose.yml
 
 - name: Run dial.sh script
-  command: "{{ indigo_dir }}/dial.sh"
+  command: "{{ indigo_dir }}/dial.py"
