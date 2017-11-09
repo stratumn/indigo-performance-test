@@ -15,12 +15,12 @@ services:
     depends_on:
     - store
   store:
-    image: alexppxela/tmstore:latest
+    image: stratumn/tmstore:0.1.1
     command: [tmstore, -endpoint, "tcp://tmapp:46657"]
     depends_on:
     - tmapp
   tmapp:
-    image: alexppxela/dummytmpop:latest
+    image: stratumn/dummytmpop:0.1.1
     command: [dummytmpop, -home, /data/tendermint, -rules_filename, "", -unsafe]
     # command: [filetmpop, -home, /data/tendermint, -rules_filename, /data/tendermint/validation_rules.json, -log_level, debug, -unsafe]
     # image: alexppxela/tmdummy:latest
