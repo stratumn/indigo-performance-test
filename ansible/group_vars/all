@@ -5,5 +5,9 @@ gatling_home: "{{ gatling_base_dir }}/gatling"
 gatling_simulations_dir: "{{ gatling_home }}/user-files/simulations"
 gatling_results_dir: "{{ gatling_home }}/results"
 gatling_report_dir: "{{ gatling_results_dir }}/report"
+gatling_indigo_dir: "{{ gatling_base_dir }}/gatling"
 gatling_runner: "{{ gatling_home}}/bin/gatling.sh"
+key_type: "ed25519"
+validator_power: 10
 simulation_name: indigo.IndigoSimulation
+eth_limits: "{{ lookup('env', 'INDIGO_ETH_LIMITS') | mandatory }}"
